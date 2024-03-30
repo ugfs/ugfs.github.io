@@ -1,1 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Games</title>
+    <link rel="shortcut icon" type="image/x-icon" href="./misc-files/LINKD.png" />
+    <style>
+        body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-image: url(https://images.unsplash.com/photo-1465101162946-4377e57745c3?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fGdhbGF4eXxlbnwwfHwwfHx8MA%3D%3D);
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+.container {
+    text-align: center;
+    min-height: 80vh;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 3rem;
+    margin-bottom: 30px;
+    color: white; /* Adjusted color */
+    font-family: Helvetica;
+}
+
+.games-container {
+    display: flex;
+    flex-direction: column; /* Changed to column layout */
+    max-height: 400px; /* Adjusted max height */
+    overflow-y: auto; /* Added vertical scroll */
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.games-container a {
+    color: #fff;
+    text-decoration: none; /* Added to remove underline */
+}
+
+#searchbar {
+    width: 70%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    margin-bottom: 20px;
+}
+
+#list {
+    list-style-type: none;
+    padding: 0;
+    text-align: left;
+    max-width: 100px; /* Adjusted max width */
+    margin: 0 auto;
+    max-height:200px;
+}
+
+#list li {
+    margin-bottom: 10px;
+}
+
+#recently-played {
+    border: 2px solid #fff;
+    border-radius: 10px;
+    padding: 10px;
+    max-width: 300px; /* Adjusted max width */
+    margin: 20px auto;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+#recently-played h2 {
+    margin-bottom: 10px;
+    color: lightblue; /* Adjusted color */
+}
+
+#recentFilesList {
+    list-style-type: none;
+    padding: 0;
+    max-height: 150px; /* Adjusted max height */
+    overflow-y: auto; /* Added vertical scroll */
+}
+
+.random-button {
+    background-color: #333; /* Adjusted background color */
+    color: #fff;
+    border: 2px solid #333; /* Adjusted border color */
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 10px; /* Adjusted border radius */
+    transition: background-color 0.3s, color 0.3s;
+    margin-top: 20px; /* Added margin top */
+}
+
+.random-button:hover {
+    background-color: #555; /* Adjusted hover background color */
+}
+
+.random-button:active {
+    background-color: #222; /* Adjusted active background color */
+}
+.back-btn {
+    background-color: #4a4cff; /* Adjusted background color */
+    color: white;
+    border: 2px solid #000; /* Adjusted border */
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 5px; /* Added border radius */
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Added transition */
+}
+
+.back-btn:hover {
+    background-color: #3344ff; /* Adjusted hover background color */
+    border-color: #000; /* Adjusted hover border color */
+}
+
+.back-btn:active {
+    background-color: #1a23ff; /* Adjusted active background color */
+}
+    </style>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load recently played games from localStorage on page load
+    var recentlyPlayedGames = JSON.parse(localStorage.getItem('recentlyPlayedGames')) || [];
+
+    // Function to save the recently played games list to localStorage
+    function saveRecentlyPlayedGames() {
+        localStorage.setItem('recentlyPlayedGames', JSON.stringify(recentlyPlayedGames));
+    }
+
+    // Function to add a recently played game
+    function addRecentlyPlayedGame(gameName, gameLink) {
+        // Check if the game is already in the list
+        var index = recentlyPlayedGames.findIndex(function(game) {
+            return game.name === gameName && game.link === gameLink;
+        });
+
+        // If the game is not in the list, add it
+        if (index === -1) {
+            recentlyPlayedGames.unshift({ name: gameName, link: gameLink }); // Add to the beginning of the array
+        } else {
+            // If the game is already in the list, move it to the beginning
+            recentlyPlayedGames.splice(index, 1); // Remove the existing entry
+            recentlyPlayedGames.unshift({ name: gameName, link: gameLink }); // Add to the beginning of the array
+        }
+
+        // Save the updated list to localStorage
+        saveRecentlyPlayedGames();
+
+        // Render the recently played games list
+        renderRecentlyPlayedGames();
+    }
+
+    // Function to render the recently played games list
+    function renderRecentlyPlayedGames() {
+        var recentlyPlayedList = document.getElementById('recentFilesList');
+        recentlyPlayedList.innerHTML = ''; // Clear the list
+
+        recentlyPlayedGames.forEach(function(game) {
+            var listItem = document.createElement('li');
+            var link = document.createElement('a');
+            link.textContent = game.name;
+            link.setAttribute('href', game.link);
+            link.setAttribute('target', '_blank');
+            listItem.appendChild(link);
+            recentlyPlayedList.appendChild(listItem);
+        });
+    }
+
+    // Render the initially loaded recently played games list
+    renderRecentlyPlayedGames();
+
+    // Handle click events on game links using event delegation
+    document.querySelector('.games-container').addEventListener('click', function(event) {
+        // Check if the clicked element is a game link
+        if (event.target.tagName === 'A') {
+            // Prevent default link behavior
+            event.preventDefault();
+
+            // Get the game name and link from the clicked link
+            var gameName = event.target.textContent;
+            var gameLink = event.target.getAttribute('href');
+
+            // Add the game to the recently played list
+            addRecentlyPlayedGame(gameName, gameLink);
+
+            // Open the game link in a new tab
+            window.open(gameLink, '_blank');
+        }
+    });
+});
+
+// Function to pick a random game
+function pickRandomGame() {
+    var games = document.querySelectorAll('#list li a');
+    var randomIndex = Math.floor(Math.random() * games.length);
+    var randomGame = games[randomIndex];
+    // Open the selected random game in a new tab
+    window.open(randomGame.href, '_blank');
+    
+    // Add the selected random game to the recently played games list
+    var gameName = randomGame.textContent;
+    var gameLink = randomGame.href;
+    addRecentlyPlayedGame(gameName, gameLink);
+
+    // Update the recently played games list display
+    renderRecentlyPlayedGames();
+}
+
+// Function to update the recently opened games list
+function updateRecentGames(gameId, gameName) {
+    const recentGames = JSON.parse(localStorage.getItem('recentGames')) || {};
+
+    // Remove duplicates if the game is already in the list
+    delete recentGames[gameId];
+
+    // Add the new game to the object with current timestamp
+    recentGames[gameId] = Date.now();
+
+    // Limit the number of games to display
+    const maxGames = 5;
+    const sortedGames = Object.entries(recentGames).sort((a, b) => b[1] - a[1]);
+    const slicedGames = sortedGames.slice(0, maxGames);
+
+    // Create a new object with the limited games
+    const limitedGames = slicedGames.reduce((obj, [id, timestamp]) => {
+        obj[id] = timestamp;
+        return obj;
+    }, {});
+
+    // Update the recentGames object in localStorage
+    localStorage.setItem('recentGames', JSON.stringify(limitedGames));
+
+    // Update the recently opened games list in the HTML
+    const recentGamesList = document.getElementById('recentGamesList');
+    recentGamesList.innerHTML = '';
+
+    for (const [id, timestamp] of Object.entries(limitedGames)) {
+        const gameName = document.querySelector(`[data-game-id="${id}"]`).textContent;
+        const listItem = document.createElement('li');
+        listItem.textContent = `${gameName} (Opened: ${new Date(timestamp).toLocaleString()})`;
+        recentGamesList.appendChild(listItem);
+    }
+}
+
+// Add event listeners to the game links
+const gameLinks = document.querySelectorAll('.games-container a');
+gameLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+        const gameId = this.getAttribute('data-game-id');
+        const gameName = this.textContent;
+        updateRecentGames(gameId, gameName);
+    });
+});
+
+// Load the recently opened games on page load
+window.addEventListener('load', function() {
+    const recentGames = JSON.parse(localStorage.getItem('recentGames')) || {};
+    updateRecentGames(recentGames);
+});
+
+// Function to add a recently played game
+function addRecentlyPlayedGame(gameName, gameLink) {
+    var recentlyPlayedList = document.getElementById('recentFilesList');
+    var listItem = document.createElement('li');
+    var link = document.createElement('a');
+    link.textContent = gameName;
+    link.setAttribute('href', gameLink);
+    link.setAttribute('target', '_blank');
+    listItem.appendChild(link);
+    recentlyPlayedList.prepend(listItem); // Add the new game to the beginning of the list
+}
+
+// Function to search for games
+function searchGames() {
+    var input = document.getElementById('searchbar').value.toLowerCase();
+    var games = document.querySelectorAll('#list li');
+
+    games.forEach(function(game) {
+        var gameName = game.textContent.toLowerCase();
+        var match = gameName.includes(input);
+        game.style.display = match ? 'block' : 'none';
+    });
+}
+</script>
+</head>
+<body>
+    <div class="container">
+        <h1>Games</h1>
+<a href="/" class="back-btn">Back</a>
+<br><br>
+        <!-- Games container with search bar -->
+        <input type="text" id="searchbar" onkeyup="searchGames()" placeholder="Search games...">
+        <div class="games-container">
+            <ol id="list">
+               <li><a target="_blank" href="gamelink">game test</a></li>
+               
+               <!-- Add more game items as needed -->
+            </ol>
+        </div>
+
+        <!-- Recently played games -->
+        <div id="recently-played">
+            <h3>Recently Played Games</h3>
+            <ul id="recentFilesList">
+                <!-- Recently played game items will be dynamically added here -->
+            </ul>
+        </div>
+
+        <!-- Button to play a random game -->
+        <button class="random-button" onclick="pickRandomGame()">Play a Random Game</button>
+    </div>
+
+    
+</body>
+</html>
