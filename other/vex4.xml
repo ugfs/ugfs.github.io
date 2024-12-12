@@ -16,7 +16,7 @@
     <div id="content"></div>
     <div id="loader">Loading...</div>
     <script type="text/javascript">
-      var gameName = "vex-4.min.js";
+      var gameName = "https://cdn.jsdelivr.net/gh/ugfs/ugfs.github.io@main/other/vex4.js";
 
       //This all here is for cache busting;
       function addScript(src, buster, callback) {
