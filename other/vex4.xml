@@ -28,7 +28,7 @@
         document.body.appendChild(s);
       }
 
-      addScript("version.js", Date.now(), function () {
+      addScript("https://cdn.jsdelivr.net/gh/ugfs/ugfs.github.io@main/other/version.js", Date.now(), function () {
         addScript(gameName, version, function () {
           var game = new Vex4.Game();
         });
