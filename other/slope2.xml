@@ -1317,47 +1317,8 @@ body {
 			background-image: url("25020303/loading.png")
 		}
 	</style> 
-	 
-	<script>
-		var buildUrl = "Build";
-		var versionFolder = "25020303/";
-		buildUrl = "https://games.azgame.io/game/slope-3/"+versionFolder + buildUrl;
-		var loaderUrl = buildUrl + "/slope-3-v25020303.loader.js";
-		var config = {
-			dataUrl: buildUrl + "/slope-3-v25020303.data.unityweb",
-			frameworkUrl: buildUrl + "/slope-3-v25020303.framework.js.unityweb",
-			codeUrl: buildUrl + "/slope-3-v25020303.wasm.unityweb",
-			streamingAssetsUrl: versionFolder+"StreamingAssets",
-			companyName: "azgames.io",
-			productName: "Slope 3",
-			productVersion: "25020303",
-			pubId: ""
-		};
-		config.gameId = "slope-3";
-		config.eventLog=true;
-		config.buildAPI = "https://event.azgame.io/apiaz/event";
-		let currentDate = new Date();
-		let endLogDate = new Date("2025-02-21T09:13:02.345Z");
-		if(currentDate>endLogDate){
-			config.eventLog=false;
-		}
-		config.enableMoreGame="yes";
-		config.enablePromotion = true;
-		config.gdHost=isHostOnGD();
-		if(config.gdHost){
-			config.enableMoreGame="no";
-			config.enablePromotion = false;
-			config.eventLog = false;
-			let pathSegments = window.location.pathname.split('/');
-			config.gdGameId = pathSegments[1];
-		}
-		function isHostOnGD() {
-			let domainParts = window.location.hostname.split('.');
-			let mainDomain = domainParts.slice(-2).join('.');
-			return (mainDomain=="gamedistribution.com");
-		}
-	</script>
-	<script id="gmsoft-jssdk" src="https://cdn.jsdelivr.net/gh/ugfs/ugfs.github.io@main/other/slope.js"></script>
+	
+	<script src="https://cdn.jsdelivr.net/gh/ugfs/ugfs.github.io@main/other/slope.js"></script>
 </head>
 
 <body>
