@@ -277,7 +277,7 @@ input.button {
 .spotC5 { position: absolute; left: 2.50em; top: 3.5em; }
 
 </style>
-<script type="text/javascript">//<![CDATA[
+<script type="text/javascript">
 
 //*****************************************************************************
 // Do not remove this notice.
@@ -1358,8 +1358,7 @@ function removeClassName(el, name)
 			newList.push(curList[i]);
 	el.className = newList.join(" ");
 }
-
-//]]></script>
+</script>
 </head>
 <body>
 
