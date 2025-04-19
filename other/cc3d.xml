@@ -136,8 +136,8 @@
         executable: "CrazyCattle3D",
         experimentalVK: false,
         fileSizes: {
-          "CrazyCattle3D.pck": 25322272,
-          "CrazyCattle3D.wasm": 43699190,
+          "https://f005.backblazeb2.com/file/ugfsugfs/CrazyCattle3D.pck": 25322272,
+          "https://f005.backblazeb2.com/file/ugfsugfs/CrazyCattle3D.wasm": 43699190,
         },
         focusCanvas: true,
         gdextensionLibs: [],
