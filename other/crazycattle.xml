@@ -127,7 +127,7 @@
       <div id="status-notice"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/gh/ugfs/ugfs.github.io@main/other/cc.js" type="325d592f1f865e0e153b8ac6-text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/gh/ugfs/ugfs.github.io@main/other/cc2.js" type="325d592f1f865e0e153b8ac6-text/javascript"></script>
     <script type="325d592f1f865e0e153b8ac6-text/javascript">
       const GODOT_CONFIG = {
         args: [],
