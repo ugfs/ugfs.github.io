@@ -1,0 +1,270 @@
+<Module>
+<ModulePrefs title="Bit Dungeon"/>
+<Content type="html">
+<![CDATA[ <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0"
+    />
+    <title>CrazyCattle3D</title>
+    <style>
+      html,
+      body,
+      #canvas {
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+
+      body {
+        color: white;
+        background-color: black;
+        overflow: hidden;
+        touch-action: none;
+      }
+
+      #canvas {
+        display: block;
+      }
+
+      #canvas:focus {
+        outline: none;
+      }
+
+      #status,
+      #status-splash,
+      #status-progress {
+        position: absolute;
+        left: 0;
+        right: 0;
+      }
+
+      #status,
+      #status-splash {
+        top: 0;
+        bottom: 0;
+      }
+
+      #status {
+        background-color: #000000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        visibility: hidden;
+      }
+
+      #status-splash {
+        max-height: 100%;
+        max-width: 100%;
+        margin: auto;
+      }
+
+      #status-splash.show-image--false {
+        display: none;
+      }
+
+      #status-splash.fullsize--true {
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+      }
+
+      #status-splash.use-filter--false {
+        image-rendering: pixelated;
+      }
+
+      #status-progress,
+      #status-notice {
+        display: none;
+      }
+
+      #status-progress {
+        bottom: 10%;
+        width: 50%;
+        margin: 0 auto;
+      }
+
+      #status-notice {
+        background-color: #5b3943;
+        border-radius: 0.5rem;
+        border: 1px solid #9b3943;
+        color: #e0e0e0;
+        font-family: "Noto Sans", "Droid Sans", Arial, sans-serif;
+        line-height: 1.3;
+        margin: 0 2rem;
+        overflow: hidden;
+        padding: 1rem;
+        text-align: center;
+        z-index: 1;
+      }
+    </style>
+    <link
+      id="-gd-engine-icon"
+      rel="icon"
+      type="image/png"
+      href="CrazyCattle3D.icon.png"
+    />
+    <link rel="apple-touch-icon" href="CrazyCattle3D.apple-touch-icon.png" />
+    <link rel="manifest" href="https://cdn.jsdelivr.net/gh/ugfs/ugfs.github.io@main/other/cc.json" />
+  </head>
+  <body>
+    <canvas id="canvas"> Your browser does not support the canvas tag. </canvas>
+
+    <noscript> Your browser does not support JavaScript. </noscript>
+
+    <div id="status">
+      <img
+        id="status-splash"
+        class="show-image--true fullsize--true use-filter--true"
+        src="CrazyCattle3D.png"
+        alt=""
+      />
+      <progress id="status-progress"></progress>
+      <div id="status-notice"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/ugfs/ugfs.github.io@main/other/cc.js" type="325d592f1f865e0e153b8ac6-text/javascript"></script>
+    <script type="325d592f1f865e0e153b8ac6-text/javascript">
+      const GODOT_CONFIG = {
+        args: [],
+        canvasResizePolicy: 2,
+        ensureCrossOriginIsolationHeaders: false,
+        executable: "CrazyCattle3D",
+        experimentalVK: false,
+        fileSizes: {
+          "https://f005.backblazeb2.com/file/ugfsugfs/CrazyCattle3D.pck": 25322272,
+          "https://f005.backblazeb2.com/file/ugfsugfs/CrazyCattle3D.wasm": 43699190,
+        },
+        focusCanvas: true,
+        gdextensionLibs: [],
+        serviceWorker: "CrazyCattle3D.service.worker.js",
+      };
+      const GODOT_THREADS_ENABLED = false;
+      const engine = new Engine(GODOT_CONFIG);
+
+      (function () {
+        const statusOverlay = document.getElementById("status");
+        const statusProgress = document.getElementById("status-progress");
+        const statusNotice = document.getElementById("status-notice");
+
+        let initializing = true;
+        let statusMode = "";
+
+        function setStatusMode(mode) {
+          if (statusMode === mode || !initializing) {
+            return;
+          }
+          if (mode === "hidden") {
+            statusOverlay.remove();
+            initializing = false;
+            return;
+          }
+          statusOverlay.style.visibility = "visible";
+          statusProgress.style.display = mode === "progress" ? "block" : "none";
+          statusNotice.style.display = mode === "notice" ? "block" : "none";
+          statusMode = mode;
+        }
+
+        function setStatusNotice(text) {
+          while (statusNotice.lastChild) {
+            statusNotice.removeChild(statusNotice.lastChild);
+          }
+          const lines = text.split("\n");
+          lines.forEach((line) => {
+            statusNotice.appendChild(document.createTextNode(line));
+            statusNotice.appendChild(document.createElement("br"));
+          });
+        }
+
+        function displayFailureNotice(err) {
+          console.error(err);
+          if (err instanceof Error) {
+            setStatusNotice(err.message);
+          } else if (typeof err === "string") {
+            setStatusNotice(err);
+          } else {
+            setStatusNotice("An unknown error occurred.");
+          }
+          setStatusMode("notice");
+          initializing = false;
+        }
+
+        const missing = Engine.getMissingFeatures({
+          threads: GODOT_THREADS_ENABLED,
+        });
+
+        if (missing.length !== 0) {
+          if (
+            GODOT_CONFIG["serviceWorker"] &&
+            GODOT_CONFIG["ensureCrossOriginIsolationHeaders"] &&
+            "serviceWorker" in navigator
+          ) {
+            let serviceWorkerRegistrationPromise;
+            try {
+              serviceWorkerRegistrationPromise =
+                navigator.serviceWorker.getRegistration();
+            } catch (err) {
+              serviceWorkerRegistrationPromise = Promise.reject(
+                new Error("Service worker registration failed.")
+              );
+            }
+            // There's a chance that installing the service worker would fix the issue
+            Promise.race([
+              serviceWorkerRegistrationPromise
+                .then((registration) => {
+                  if (registration != null) {
+                    return Promise.reject(
+                      new Error("Service worker already exists.")
+                    );
+                  }
+                  return registration;
+                })
+                .then(() => engine.installServiceWorker()),
+              // For some reason, `getRegistration()` can stall
+              new Promise((resolve) => {
+                setTimeout(() => resolve(), 2000);
+              }),
+            ])
+              .then(() => {
+                // Reload if there was no error.
+                window.location.reload();
+              })
+              .catch((err) => {
+                console.error("Error while registering service worker:", err);
+              });
+          } else {
+            // Display the message as usual
+            const missingMsg =
+              "Error\nThe following features required to run Godot projects on the Web are missing:\n";
+            displayFailureNotice(missingMsg + missing.join("\n"));
+          }
+        } else {
+          setStatusMode("progress");
+          engine
+            .startGame({
+              onProgress: function (current, total) {
+                if (current > 0 && total > 0) {
+                  statusProgress.value = current;
+                  statusProgress.max = total;
+                } else {
+                  statusProgress.removeAttribute("value");
+                  statusProgress.removeAttribute("max");
+                }
+              },
+            })
+            .then(() => {
+              setStatusMode("hidden");
+            }, displayFailureNotice);
+        }
+      })();
+    </script>
+  <script data-cf-settings="325d592f1f865e0e153b8ac6-|49" defer>!function(){"use strict";function t(){return"cf-marker-"+Math.random().toString().slice(2)}function e(){for(var t=[],e=0;e<arguments.length;e++)t[e]=arguments[e];(n=console.warn||console.log).call.apply(n,[console,"[ROCKET LOADER] "].concat(t));var n}function n(t,e){var n=e.parentNode;n&&h(t,n,e)}function r(t,e){h(t,e,e.childNodes[0])}function o(t){var e=t.parentNode;e&&e.removeChild(t)}function i(t){var e=t.namespaceURI===A?"xlink:href":"src";return t.getAttribute(e)}function a(t,e){var n=t.type.substr(e.length);return!(n&&!E[n.trim()])&&((!k||!t.hasAttribute("nomodule"))&&!(!k&&"module"===n))}function c(t){return a(t,"")}function s(t,e){return function(n){if(e(),t)return t.call(this,n)}}function u(t,e){t.onload=s(t.onload,e),t.onerror=s(t.onerror,e)}function p(t){var e=document.createElementNS(t.namespaceURI,"script");e.async=t.hasAttribute("async"),e.textContent=t.textContent;for(var n=0;n<t.attributes.length;n++){var r=t.attributes[n];try{r.namespaceURI?e.setAttributeNS(r.namespaceURI,r.name,r.value):e.setAttribute(r.name,r.value)}catch(o){}}return e}function l(t,e){var n=new I(e);t.dispatchEvent(n)}function d(e){var n=e.namespaceURI===A,r=t();e.setAttribute(r,"");var i=n?"<svg>"+e.outerHTML+"</svg>":e.outerHTML;L.call(document,i);var a=document.querySelector("["+r+"]");if(a){a.removeAttribute(r);var c=n&&a.parentNode;c&&o(c)}return a}function f(t){if(t&&"handleEvent"in t){var e=t.handleEvent;return"function"==typeof e?e.bind(t):e}return t}function h(t,e,n){var r=n?function(t){return e.insertBefore(t,n)}:function(t){return e.appendChild(t)};Array.prototype.slice.call(t).forEach(r)}function v(){return/chrome/i.test(navigator.userAgent)&&/google/i.test(navigator.vendor)}function y(t,e){function n(){this.constructor=t}H(t,e),t.prototype=null===e?Object.create(e):(n.prototype=e.prototype,new n)}function m(t){return t instanceof Window?["load"]:t instanceof Document?["DOMContentLoaded","readystatechange"]:[]}function b(t){var e=t.getAttribute(R);if(!e)return null;var n=e.split(T);return{nonce:n[0],handlerPrefixLength:+n[1],bailout:!t.hasAttribute("defer")}}function g(t){var e=B+t.nonce;Array.prototype.forEach.call(document.querySelectorAll("["+e+"]"),function(n){n.removeAttribute(e),Array.prototype.forEach.call(n.attributes,function(e){/^on/.test(e.name)&&"function"!=typeof n[e.name]&&n.setAttribute(e.name,e.value.substring(t.handlerPrefixLength))})})}function S(){var t=window;"undefined"!=typeof Promise&&(t.__cfQR={done:new Promise(function(t){return U=t})})}function w(t){var e=new N(t),n=new C(e);e.harvestScriptsInDocument(),new W(e,{nonce:t,blocking:!0,docWriteSimulator:n,callback:function(){}}).run()}function x(t){var e=new N(t),n=new C(e);e.harvestScriptsInDocument();var r=new W(e,{nonce:t,blocking:!1,docWriteSimulator:n,callback:function(){window.__cfRLUnblockHandlers=!0,r.removePreloadHints(),P(t)}});r.insertPreloadHints(),M.runOnLoad(function(){r.run()})}function P(t){var e=new O(t);M.simulateStateBeforeDeferScriptsActivation(),e.harvestDeferScriptsInDocument(),new W(e,{nonce:t,blocking:!1,callback:function(){M.simulateStateAfterDeferScriptsActivation(),U&&U()}}).run()}var A="http://www.w3.org/2000/svg",E={"application/ecmascript":!0,"application/javascript":!0,"application/x-ecmascript":!0,"application/x-javascript":!0,"text/ecmascript":!0,"text/javascript":!0,"text/javascript1.0":!0,"text/javascript1.1":!0,"text/javascript1.2":!0,"text/javascript1.3":!0,"text/javascript1.4":!0,"text/javascript1.5":!0,"text/jscript":!0,"text/livescript":!0,"text/x-ecmascript":!0,"text/x-javascript":!0,module:!0},k=void 0!==document.createElement("script").noModule,I=function(){var t=window;return t.__rocketLoaderEventCtor||Object.defineProperty(t,"__rocketLoaderEventCtor",{value:Event}),t.__rocketLoaderEventCtor}(),L=document.write,_=document.writeln,H=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var n in e)e.hasOwnProperty(n)&&(t[n]=e[n])},D=function(){function t(t){this.nonce=t,this.items=[]}return Object.defineProperty(t.prototype,"hasItems",{get:function(){return this.items.length>0},enumerable:!0,configurable:!0}),t.prototype.pop=function(){return this.items.pop()},t.prototype.forEach=function(t){this.items.forEach(function(e){var n=e.script;return t(n)})},t.prototype.harvestScripts=function(t,e){var n=this,r=e.filter,o=e.mutate;Array.prototype.slice.call(t.querySelectorAll("script")).filter(r).reverse().forEach(function(t){o(t),n.pushScriptOnStack(t)})},t.prototype.pushScriptOnStack=function(t){var e=t.parentNode,n=this.createPlaceholder(t),r=!!i(t);e.replaceChild(n,t),this.items.push({script:t,placeholder:n,external:r,async:r&&t.hasAttribute("async"),executable:c(t)})},t.prototype.hasNonce=function(t){return 0===(t.getAttribute("type")||"").indexOf(this.nonce)},t.prototype.removeNonce=function(t){t.type=t.type.substr(this.nonce.length)},t.prototype.makeNonExecutable=function(t){t.type=this.nonce+t.type},t.prototype.isPendingDeferScript=function(t){return t.hasAttribute("defer")||t.type===this.nonce+"module"&&!t.hasAttribute("async")},t}(),N=function(t){function e(){return null!==t&&t.apply(this,arguments)||this}return y(e,t),e.prototype.harvestScriptsInDocument=function(){var t=this;this.harvestScripts(document,{filter:function(e){return t.hasNonce(e)},mutate:function(e){t.isPendingDeferScript(e)||t.removeNonce(e)}})},e.prototype.harvestScriptsAfterDocWrite=function(t){var e=this;this.harvestScripts(t,{filter:c,mutate:function(t){e.isPendingDeferScript(t)&&e.makeNonExecutable(t)}})},e.prototype.createPlaceholder=function(t){return document.createComment(t.outerHTML)},e}(D),O=function(t){function e(){return null!==t&&t.apply(this,arguments)||this}return y(e,t),e.prototype.harvestDeferScriptsInDocument=function(){var t=this;this.harvestScripts(document,{filter:function(e){return t.hasNonce(e)&&t.isPendingDeferScript(e)},mutate:function(e){return t.removeNonce(e)}})},e.prototype.createPlaceholder=function(t){var e=p(t);return this.makeNonExecutable(e),e},e}(D),C=function(){function t(t){this.scriptStack=t}return t.prototype.enable=function(t){var e=this;this.insertionPointMarker=t,this.buffer="",document.write=function(){for(var t=[],n=0;n<arguments.length;n++)t[n]=arguments[n];return e.write(t,!1)},document.writeln=function(){for(var t=[],n=0;n<arguments.length;n++)t[n]=arguments[n];return e.write(t,!0)}},t.prototype.flushWrittenContentAndDisable=function(){document.write=L,document.writeln=_,this.buffer.length&&(document.contains(this.insertionPointMarker)?this.insertionPointMarker.parentNode===document.head?this.insertContentInHead():this.insertContentInBody():e("Insertion point marker for document.write was detached from document:","Markup will not be inserted"))},t.prototype.insertContentInHead=function(){var t=new DOMParser,e="<!DOCTYPE html><head>"+this.buffer+"</head>",o=t.parseFromString(e,"text/html");if(this.scriptStack.harvestScriptsAfterDocWrite(o),n(o.head.childNodes,this.insertionPointMarker),o.body.childNodes.length){for(var i=Array.prototype.slice.call(o.body.childNodes),a=this.insertionPointMarker.nextSibling;a;)i.push(a),a=a.nextSibling;document.body||L.call(document,"<body>"),r(i,document.body)}},t.prototype.insertContentInBody=function(){var t=this.insertionPointMarker.parentElement,e=document.createElement(t.tagName);e.innerHTML=this.buffer,this.scriptStack.harvestScriptsAfterDocWrite(e),n(e.childNodes,this.insertionPointMarker)},t.prototype.write=function(t,e){var n=document.currentScript;n&&i(n)&&n.hasAttribute("async")?(r=e?_:L).call.apply(r,[document].concat(t)):this.buffer+=t.map(String).join(e?"\n":"");var r},t}(),j=function(){function t(){var t=this;this.simulatedReadyState="loading",this.bypassEventsInProxies=!1,this.nativeWindowAddEventListener=window.addEventListener;try{Object.defineProperty(document,"readyState",{get:function(){return t.simulatedReadyState}})}catch(e){}this.setupEventListenerProxy(),this.updateInlineHandlers()}return t.prototype.runOnLoad=function(t){var e=this;this.nativeWindowAddEventListener.call(window,"load",function(n){if(!e.bypassEventsInProxies)return t(n)})},t.prototype.updateInlineHandlers=function(){this.proxyInlineHandler(document,"onreadystatechange"),this.proxyInlineHandler(window,"onload"),document.body&&this.proxyInlineHandler(document.body,"onload")},t.prototype.simulateStateBeforeDeferScriptsActivation=function(){this.bypassEventsInProxies=!0,this.simulatedReadyState="interactive",l(document,"readystatechange"),this.bypassEventsInProxies=!1},t.prototype.simulateStateAfterDeferScriptsActivation=function(){var t=this;this.bypassEventsInProxies=!0,l(document,"DOMContentLoaded"),this.simulatedReadyState="complete",l(document,"readystatechange"),l(window,"load"),this.bypassEventsInProxies=!1,window.setTimeout(function(){return t.bypassEventsInProxies=!0},0)},t.prototype.setupEventListenerProxy=function(){var t=this;("undefined"!=typeof EventTarget?[EventTarget.prototype]:[Node.prototype,Window.prototype]).forEach(function(e){return t.patchEventTargetMethods(e)})},t.prototype.patchEventTargetMethods=function(t){var e=this,n=t.addEventListener,r=t.removeEventListener;t.addEventListener=function(t,r){for(var o=[],i=2;i<arguments.length;i++)o[i-2]=arguments[i];var a=m(this),c=r&&r.__rocketLoaderProxiedHandler;if(!c){var s=f(r);"function"==typeof s?(c=function(n){if(e.bypassEventsInProxies||a.indexOf(t)<0)return s.call(this,n)},Object.defineProperty(r,"__rocketLoaderProxiedHandler",{value:c})):c=r}n.call.apply(n,[this,t,c].concat(o))},t.removeEventListener=function(t,e){for(var n=[],o=2;o<arguments.length;o++)n[o-2]=arguments[o];var i=e&&e.__rocketLoaderProxiedHandler||e;r.call.apply(r,[this,t,i].concat(n))}},t.prototype.proxyInlineHandler=function(t,e){try{var n=t[e];if(n&&!n.__rocketLoaderInlineHandlerProxy){var r=this;t[e]=function(t){if(r.bypassEventsInProxies)return n.call(this,t)},Object.defineProperty(t[e],"__rocketLoaderInlineHandlerProxy",{value:!0})}}catch(o){return void console.warn("encountered an error when accessing "+e+" handler:",o.message)}},t}(),M=function(){var t=window;return t.__rocketLoaderLoadProgressSimulator||Object.defineProperty(t,"__rocketLoaderLoadProgressSimulator",{value:new j}),t.__rocketLoaderLoadProgressSimulator}(),W=function(){function t(t,e){this.scriptStack=t,this.settings=e,this.preloadHints=[]}return t.prototype.insertPreloadHints=function(){var t=this;this.scriptStack.forEach(function(e){if(a(e,t.settings.nonce)){var n=i(e),r=v()&&e.hasAttribute("integrity");if(n&&!r){var o=document.createElement("link");o.setAttribute("rel","preload"),o.setAttribute("as","script"),o.setAttribute("href",n),e.crossOrigin&&o.setAttribute("crossorigin",e.crossOrigin),document.head.appendChild(o),t.preloadHints.push(o)}}})},t.prototype.removePreloadHints=function(){this.preloadHints.forEach(function(t){return o(t)})},t.prototype.run=function(){for(var t=this,e=this;this.scriptStack.hasItems;){var n=function(){var n=e.settings.docWriteSimulator,r=e.scriptStack.pop();n&&!r.async&&n.enable(r.placeholder);var o=e.activateScript(r);return o?r.external&&r.executable&&!r.async?(u(o,function(){t.finalizeActivation(r),t.run()}),{value:void 0}):void e.finalizeActivation(r):(n&&n.flushWrittenContentAndDisable(),"continue")}();if("object"==typeof n)return n.value}this.scriptStack.hasItems||this.settings.callback()},t.prototype.finalizeActivation=function(t){this.settings.docWriteSimulator&&!t.async&&this.settings.docWriteSimulator.flushWrittenContentAndDisable(),M.updateInlineHandlers(),o(t.placeholder)},t.prototype.activateScript=function(t){var n=t.script,r=t.placeholder,o=t.external,i=t.async,a=r.parentNode;if(!document.contains(r))return e("Placeholder for script \n"+n.outerHTML+"\n was detached from document.","Script will not be executed."),null;var c=this.settings.blocking&&o&&!i?d(n):p(n);return c?(a.insertBefore(c,r),c):(e("Failed to create activatable copy of script \n"+n.outerHTML+"\n","Script will not be executed."),null)},t}(),R="data-cf-settings",T="|",B="data-cf-modified-",U=void 0;!function(){var t=document.currentScript;if(t){var n=b(t);n?(o(t),g(n),M.updateInlineHandlers(),n.bailout?w(n.nonce):(S(),x(n.nonce))):e("Activator script doesn't have settings. No scripts will be executed.")}else e("Can't obtain activator script. No scripts will be executed.")}()}();</script>
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"9328d33ceb77438d","version":"2025.4.0-1-g37f21b1","r":1,"token":"c78865f5363a46ff98d836c4c72d41b6","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}}}' crossorigin="anonymous"></script>
+</body>
+</html> ]]>
+</Content>
+</Module>
